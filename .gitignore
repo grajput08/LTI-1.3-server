@@ -2,7 +2,6 @@
 *.pem
 *.key
 .env
-node_modules/
 config/private*
 config/public*
 config/views*
