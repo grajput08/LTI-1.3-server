@@ -42,6 +42,15 @@ lti.setup(
 lti.app.set("views", path.join(__dirname, "views"));
 lti.app.set("view engine", "ejs");
 
+// Add route handler for the root path
+lti.onConnect((token, req, res) => {
+  return res.render("index", {
+    title: "LTI Tool",
+    message: "Platform confirmation successful!",
+    token: token,
+  });
+});
+
 // Setup and deploy
 const setup = async () => {
   const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
