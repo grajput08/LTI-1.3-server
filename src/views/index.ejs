@@ -111,5 +111,12 @@
         >
       </div>
     </div>
+    <h1><%= message %></h1>
+    <p>Successfully connected to the LTI platform!</p>
+
+    <!-- Optional: Display some token information -->
+    <% if (token) { %>
+    <p>User: <%= token.user %></p>
+    <% } %>
   </body>
 </html>
