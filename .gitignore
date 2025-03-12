@@ -1,11 +1,9 @@
 # Create or update .gitignore
-echo "*.pem" >> .gitignore
-echo "*.key" >> .gitignore
-echo ".env" >> .gitignore
-echo "config/private*" >> .gitignore
-echo "config/public*" >> .gitignore
-echo "config/views*" >> .gitignore
-echo "config/static*" >> .gitignore
-echo "config/public*" >> .gitignore
-echo "config/views*" >> .gitignore
-echo "config/static*" >> .gitignore
+*.pem
+*.key
+.env
+node_modules/
+config/private*
+config/public*
+config/views*
+config/static*
