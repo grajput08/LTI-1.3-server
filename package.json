@@ -1,0 +1,40 @@
+{
+  "name": "lti-hello-world",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate:create": "ts-node src/db/migrations/create-tables.ts",
+    "migrate:cleanup": "ts-node src/db/migrations/cleanup.ts",
+    "db:test": "ts-node src/db/config.ts",
+    "lti:test": "ts-node src/test-lti.ts",
+    "migrate": "npm run migrate:cleanup && npm run migrate:create"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^5.0.0",
+    "@types/ltijs": "^4.0.12",
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.11.11",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "ltijs": "^5.9.6",
+    "ltijs-sequelize": "^2.4.4",
+    "pg": "^8.14.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2"
+  }
+}
