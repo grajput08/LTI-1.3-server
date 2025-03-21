@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h1>Create Resource</h1>
+    <form action="/submit-deep-linking" method="POST">
+      <div>
+        <label for="title">Resource Title:</label>
+        <input type="text" id="title" name="title" required />
+      </div>
+      <div>
+        <label for="resource_id">Resource ID:</label>
+        <input type="text" id="resource_id" name="resource_id" />
+      </div>
+      <div>
+        <label for="content_type">Content Type:</label>
+        <input type="text" id="content_type" name="content_type" />
+      </div>
+      <button type="submit">Create Resource</button>
+    </form>
+  </body>
+</html>

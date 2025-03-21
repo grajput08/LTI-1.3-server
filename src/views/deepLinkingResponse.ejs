@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deep Linking Response</title>
+    <script>
+      window.onload = function () {
+        // Auto-submit the form to return to Canvas
+        document.getElementById("deep-linking-form").submit();
+      };
+    </script>
+  </head>
+  <body>
+    <form id="deep-linking-form" method="POST" action="<%= response.url %>">
+      <input type="hidden" name="JWT" value="<%= response.jwt %>" />
+    </form>
+  </body>
+</html>

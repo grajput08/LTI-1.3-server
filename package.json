@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
+    "dev": "env DEBUG=provider:* nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node src/index.ts",
+    "start": "env DEBUG=provider:* node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate:create": "ts-node src/db/migrations/create-tables.ts",
     "migrate:cleanup": "ts-node src/db/migrations/cleanup.ts",

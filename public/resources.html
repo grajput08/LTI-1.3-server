@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Select Resources</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .resource-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .resource-card.selected {
+        border-color: #4caf50;
+        background-color: #e8f5e9;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Select Resources to Add</h1>
+    <p>
+      Click on the resources you want to add to your course, then click "Add
+      Selected Resources".
+    </p>
+
+    <div class="resource-grid" id="resourceGrid">
+      <!-- Resource cards will be dynamically added here -->
+    </div>
+
+    <button onclick="submitResources()">Add Selected Resources</button>
+
+    <script>
+      // Sample resources - replace with your actual resources
+      const resources = [
+        {
+          id: "1",
+          title: "Sample Quiz",
+          description: "A sample quiz resource",
+          type: "ltiResourceLink",
+          custom: {
+            resource_type: "quiz",
+          },
+        },
+        {
+          id: "2",
+          title: "Sample Assignment",
+          description: "A sample assignment resource",
+          type: "ltiResourceLink",
+          custom: {
+            resource_type: "assignment",
+          },
+        },
+        {
+          id: "3",
+          title: "Sample Content Page",
+          description: "A sample content page resource",
+          type: "ltiResourceLink",
+          custom: {
+            resource_type: "page",
+          },
+        },
+      ];
+
+      // Create resource cards
+      const resourceGrid = document.getElementById("resourceGrid");
+      resources.forEach((resource) => {
+        const card = document.createElement("div");
+        card.className = "resource-card";
+        card.setAttribute("data-id", resource.id);
+        card.innerHTML = `
+                <h3>${resource.title}</h3>
+                <p>${resource.description}</p>
+            `;
+        card.onclick = () => toggleSelection(card);
+        resourceGrid.appendChild(card);
+      });
+
+      // Handle card selection
+      function toggleSelection(card) {
+        card.classList.toggle("selected");
+      }
+
+      // Submit selected resources
+      function submitResources() {
+        const selectedCards = document.querySelectorAll(
+          ".resource-card.selected"
+        );
+        const selectedResources = Array.from(selectedCards).map((card) => {
+          const resource = resources.find(
+            (r) => r.id === card.getAttribute("data-id")
+          );
+          return {
+            type: resource.type,
+            title: resource.title,
+            custom: resource.custom,
+            url: window.location.origin + "/launch",
+          };
+        });
+
+        // Send the selected resources back to the platform
+        window.parent.postMessage(
+          {
+            subject: "lti.resourceSelected",
+            resources: selectedResources,
+          },
+          "*"
+        );
+      }
+    </script>
+  </body>
+</html>
