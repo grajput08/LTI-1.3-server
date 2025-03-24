@@ -37,7 +37,7 @@ lti.setup(
     loginUrl: "/login",
     staticPath: path.join(__dirname, "../public"),
     cookies: {
-      secure: false, // Set secure to true if the testing platform is in a different domain and https is being used
+      secure: true, // Set secure to true if the testing platform is in a different domain and https is being used
       sameSite: "", // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
     },
     devMode: true,
@@ -92,12 +92,17 @@ const setup = async () => {
       },
     });
 
-    console.log(`\n✅ LTI tool running on http://localhost:${PORT}`);
+    // lti.deletePlatform(
+    //   process.env.CANVAS_URL || "https://canvas.instructure.com",
+    //   process.env.CANVAS_CLIENT_ID || "client_id"
+    // );
+
+    console.log(`\n✅ LTI tool running on ${process.env.CANVAS_URL}`);
     console.log("Configuration URLs for Canvas:");
-    console.log(`Launch URL: http://localhost:${PORT}/launch`);
-    console.log(`Login URL: http://localhost:${PORT}/login`);
-    console.log(`JWKS URL: http://localhost:${PORT}/keys`);
-    console.log(`OIDC URL: http://localhost:${PORT}/oidc`);
+    console.log(`Launch URL: ${process.env.CANVAS_URL}/launch`);
+    console.log(`Login URL: ${process.env.CANVAS_URL}/login`);
+    console.log(`JWKS URL: ${process.env.CANVAS_URL}/keys`);
+    console.log(`OIDC URL: ${process.env.CANVAS_URL}/oidc`);
   } catch (error) {
     console.error("\n❌ Setup failed!");
     console.error("Error details:", error);
