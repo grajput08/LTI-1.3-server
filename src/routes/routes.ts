@@ -1,3 +1,4 @@
+import db from "../db/config";
 const router = require("express").Router();
 const path = require("path");
 
@@ -10,16 +11,19 @@ router.get("/audio-records", async (req: any, res: any) => {
       title: "Audio Record 1",
       duration: "3:45",
       artist: "Artist1",
+      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     },
     {
       title: "Audio Record 2",
       duration: "4:20",
       artist: "Artist2",
+      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     },
     {
       title: "Audio Record 3",
       duration: "2:55",
       artist: "Artist3",
+      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     },
   ];
   return res.send(resources);
@@ -43,31 +47,7 @@ router.get("/info", async (req: any, res: any) => {
   return res.send(info);
 });
 
-interface DeepLinkRequest {
-  name: string;
-  value: string;
-  description?: string;
-  gradable?: boolean;
-  startDate?: string;
-  endDate?: string;
-}
-
-interface DeepLinkingResource {
-  title: string;
-  url?: string;
-  path?: string;
-}
-
-interface LtiResourceLinkItem {
-  type: "ltiResourceLink";
-  title: string;
-  custom: {
-    name: string;
-    value: string;
-  };
-}
-
-router.post("/deeplink", async (req: any, res: any) => {
+router.post("/submitted", async (req: any, res: any) => {
   try {
     const resource = req.body;
     const token = res.locals.token;
@@ -93,47 +73,78 @@ router.post("/deeplink", async (req: any, res: any) => {
         text: `Audio Recording Assignment: ${resource.title}`,
         url: token.platformContext.targetLinkUri,
         custom: {
-          resource_link_title: resource.title,
+          resource_link_title: resource.link,
+          title: resource.title,
           artist: resource.artist || "",
           assignment_type: "audio_recording",
-          duration: resource.duration || 1200, // default 20 minutes
+          duration: resource.duration || 1200,
+        },
+        userInfo: {
+          user_id: token.user,
+          given_name: token.userInfo.given_name,
+          family_name: token.userInfo.family_name,
+          name: token.userInfo.name,
+          email: token.userInfo.email,
         },
       },
     ];
 
     try {
-      const deepLinkingMessage = await lti.DeepLinking.createDeepLinkingMessage(
+      const responseJson = {
         token,
         items,
-        { message: "Successfully Registered" }
-      );
-
-      const responseJson = {
-        deepLinkingMessage,
-        lmsEndpoint:
-          token.platformContext.deepLinkingSettings.deep_link_return_url,
+        resource,
       };
 
-      console.log("Response JSON:", responseJson);
+      // Save to database
+      const submissionData = {
+        userId: token.user,
+        title: resource.title,
+        artist: resource.artist,
+        link: resource.link,
+        duration: resource.duration || 1200,
+        createdAt: new Date(),
+        platformContext: token.platformContext,
+        items: items,
+      };
 
-      // Create the deep linking form
-      // const form = await lti.DeepLinking.createDeepLinkingForm(token, items, {
-      //   message: "Successfully registered resource!",
-      // });
+      try {
+        // Convert duration from "mm:ss" to seconds
+        const durationInSeconds = submissionData.duration.includes(":")
+          ? submissionData.duration
+              .split(":")
+              .reduce(
+                (acc: number, time: string) => 60 * acc + parseInt(time),
+                0
+              )
+          : submissionData.duration || 1200;
 
-      // console.log("Form:", form);
-
-      // return res.send(form);
-      if (deepLinkingMessage) {
-        return res.send(responseJson);
+        await db.query(
+          "INSERT INTO submissions (userId, title, artist, link, duration, createdAt, platformContext, items) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+          [
+            submissionData.userId,
+            submissionData.title,
+            submissionData.artist,
+            submissionData.link,
+            durationInSeconds,
+            submissionData.createdAt,
+            JSON.stringify(submissionData.platformContext),
+            JSON.stringify(submissionData.items),
+          ]
+        );
+      } catch (dbError) {
+        console.error("Database Error:", dbError);
+        return res.status(500).send({
+          error: "Failed to save submission to database",
+        });
       }
+
+      console.log("Response JSON:", token, items, resource);
+      return res.send(responseJson);
     } catch (dlError) {
       console.error("Deep Linking Error:", dlError);
       console.log("Deep Linking Settings:", dlError);
-      if (
-        dlError instanceof Error &&
-        dlError.message === "MISSING_DEEP_LINK_SETTINGS"
-      ) {
+      if (dlError instanceof Error) {
         return res.status(400).send({
           error:
             "This route must be accessed through a deep linking launch from your LMS",
@@ -213,9 +224,78 @@ router.post("/grade", async (req: any, res: any) => {
     return res.status(500).send({ error: "An unknown error occurred" });
   }
 });
+
+router.get("/submissions", async (req: any, res: any) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+
+    const countResult = await db.query("SELECT COUNT(*) FROM submissions");
+    const totalItems = parseInt(countResult.rows[0].count);
+
+    const result = await db.query(
+      'SELECT * FROM submissions ORDER BY "createdat" DESC LIMIT $1 OFFSET $2',
+      [limit, offset]
+    );
+
+    // Transform the submissions data
+    const formattedSubmissions = result.rows.map((submission) => ({
+      id: submission.id,
+      user: {
+        id: submission.userid,
+        name: submission.items[0]?.userInfo?.name || "",
+        email: submission.items[0]?.userInfo?.email || "",
+        givenName: submission.items[0]?.userInfo?.given_name || "",
+        familyName: submission.items[0]?.userInfo?.family_name || "",
+      },
+      submission: {
+        title: submission.title,
+        artist: submission.artist,
+        link: submission.link,
+        duration: {
+          seconds: submission.duration,
+          formatted: formatDuration(submission.duration),
+        },
+        createdAt: submission.createdat,
+      },
+      context: {
+        courseTitle: submission.platformcontext?.context?.title || "",
+        courseLabel: submission.platformcontext?.context?.label || "",
+        roles: submission.platformcontext?.roles || [],
+        resourceTitle: submission.platformcontext?.resource?.title || "",
+      },
+    }));
+
+    return res.send({
+      submissions: formattedSubmissions,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems: totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    return res.status(500).send({ error: "Failed to fetch submissions" });
+  }
+});
+
+// Helper function to format duration from seconds to mm:ss
+function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+// Update the catch-all route to handle the new paths
 router.get("*", (req: any, res: any) => {
   const ltik = req.query.ltik;
-  res.redirect(`http://localhost:4001${ltik ? `?ltik=${ltik}` : ""}`);
+  const path = req.path;
+
+  // Preserve the original path when redirecting
+  res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
 });
 
 export default router;

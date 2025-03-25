@@ -10,7 +10,6 @@
     "migrate:create": "ts-node src/db/migrations/create-tables.ts",
     "migrate:cleanup": "ts-node src/db/migrations/cleanup.ts",
     "db:test": "ts-node src/db/config.ts",
-    "lti:test": "ts-node src/test-lti.ts",
     "migrate": "npm run migrate:cleanup && npm run migrate:create"
   },
   "keywords": [],

@@ -16,7 +16,17 @@ export const createTables = async () => {
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      // ... rest of the table creation queries ...
+      CREATE TABLE IF NOT EXISTS submissions (
+        id SERIAL PRIMARY KEY,
+        userId VARCHAR(255) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        artist VARCHAR(255) NOT NULL,
+        link VARCHAR(255),
+        duration INTEGER,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        platformContext JSONB,
+        items JSONB
+      );
     `);
     console.log("✅ Database tables created successfully");
   } catch (error) {

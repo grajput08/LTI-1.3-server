@@ -50,28 +50,22 @@ lti.app.set("view engine", "ejs");
 
 // Add route handler for the root path
 lti.onConnect((token, req, res) => {
+  // Check the launch context and redirect accordingly
+  console.log(
+    "Check the launch context and redirect accordingly Token:",
+    token
+  );
+
+  // Default view for other launches
   return res.render("index", {
     title: "LTI Tool",
     message: "Platform confirmation successful!",
     token: token,
   });
 });
+
 // Setting up routes
 lti.app.use(routes);
-
-// Register Deep Linking endpoint
-lti.onDeepLinking((token, req, res) => {
-  try {
-    console.log("Deep linking request received:", token, req, res);
-
-    // Redirect user to the resource selection view
-    console.log("Redirecting to deeplink");
-    lti.redirect(res, "/deeplink", { isNewResource: true });
-  } catch (err) {
-    console.error("Error handling deep linking request:", err);
-    res.status(500).send("Error processing the deep linking request.");
-  }
-});
 
 // Setup and deploy
 const setup = async () => {
@@ -91,11 +85,6 @@ const setup = async () => {
         key: `${process.env.CANVAS_URL}/api/lti/security/jwks`,
       },
     });
-
-    // lti.deletePlatform(
-    //   process.env.CANVAS_URL || "https://canvas.instructure.com",
-    //   process.env.CANVAS_CLIENT_ID || "client_id"
-    // );
 
     console.log(`\n✅ LTI tool running on ${process.env.CANVAS_URL}`);
     console.log("Configuration URLs for Canvas:");
