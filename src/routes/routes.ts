@@ -47,7 +47,7 @@ router.get("/info", async (req: any, res: any) => {
   return res.send(info);
 });
 
-router.post("/submitted", async (req: any, res: any) => {
+router.post("/submit/audio", async (req: any, res: any) => {
   try {
     const resource = req.body;
     const token = res.locals.token;
@@ -225,7 +225,7 @@ router.post("/grade", async (req: any, res: any) => {
   }
 });
 
-router.get("/submissions", async (req: any, res: any) => {
+router.get("/submitted/audio", async (req: any, res: any) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
