@@ -1,4 +1,4 @@
-# LTI Hello World
+# LTI 1.3 Assignment Submission Tool
 
 A TypeScript-based Learning Tools Interoperability (LTI) 1.3 tool for integration with Canvas LMS, built using the LTIJS framework.
 
@@ -13,7 +13,7 @@ A TypeScript-based Learning Tools Interoperability (LTI) 1.3 tool for integratio
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/lti-hello-world.git
+git clone https://github.com/grajput08/LTI-1.3-server.git
 cd lti-hello-world
 ```
 
@@ -218,12 +218,12 @@ Note: Each time you restart ngrok, you'll get a new URL and will need to update 
 
 ![Step 1: Initial Launch Request](./public/Step%201.png)
 
-![Step 2: OIDC Login Initiation](./public/Step%202.png)
+![Step 2: OIDC Login Initiation](./public/step%202.png)
 
 ![Step 3: Authentication Response](./public/Step%203.png)
 
-![Step 4: Launch URL Redirect](./public/Step%204.png)
+![Step 4: Launch URL Redirect](./public/step%204.png)
 
-![Step 5: Tool Display](./public/Step%205.png)
+![Step 5: Tool Display](./public/step%205.png)
 
 For technical details about each step, refer to the [LTI 1.3 Implementation Guide](https://www.imsglobal.org/spec/lti/v1p3/).
