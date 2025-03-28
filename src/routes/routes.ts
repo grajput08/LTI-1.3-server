@@ -65,6 +65,19 @@ router.post("/submit/audio", async (req: any, res: any) => {
   try {
     const resource = req.body;
     const token = res.locals.token;
+    const roles = res.locals.context?.roles || [];
+
+    // Check if user is a student
+    const isStudent = roles.some(
+      (role: string) => role.includes("Student") || role.includes("Learner")
+    );
+
+    // Only students can submit assignments
+    if (!isStudent) {
+      return res.status(403).send({
+        error: "Only students can submit assignments",
+      });
+    }
 
     // Validate that this is a deep linking request
     if (!token || !token.platformContext) {
