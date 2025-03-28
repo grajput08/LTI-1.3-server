@@ -23,6 +23,9 @@ export const createTables = async () => {
         artist VARCHAR(255) NOT NULL,
         link VARCHAR(255),
         duration INTEGER,
+        feedback TEXT,
+        feedback_by VARCHAR(255),
+        feedback_at TIMESTAMP,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         platformContext JSONB,
         items JSONB
