@@ -5,25 +5,39 @@ const path = require("path");
 // Requiring Ltijs
 const lti = require("ltijs").Provider;
 
-router.get("/audio-records", async (req: any, res: any) => {
+router.get("/resources", async (req: any, res: any) => {
   const resources = [
     {
       title: "Audio Record 1",
       duration: "3:45",
       artist: "Artist1",
-      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      link: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
+      transcript: {
+        "0:04":
+          "I'm Rodney, your interactive AI assistant here in the Dreamscape Learn universe, which is home to some fascinating intergalactic creatures like the Mega Rafi alien zoo, part of the Intergalactic Wildlife Sanctuary, is a virtual reality experience where you can explore diverse alien species and their habitats aimed at preserving endangered species across the galaxy.",
+      },
     },
     {
       title: "Audio Record 2",
       duration: "4:20",
       artist: "Artist2",
-      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      link: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
+      transcript: {
+        "0:29": "Are you excited to be at GSV?",
+        "0:38": "Absolutely.",
+        "0:39":
+          "It's fantastic to be here at the 2025 ASU GSV summit, sharing the wonders of Dreamscape Learn with everyone.",
+      },
     },
     {
       title: "Audio Record 3",
       duration: "2:55",
       artist: "Artist3",
-      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      link: "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg",
+      transcript: {
+        "0:45": "How about you?",
+        "0:46": "Are you having a great time at the event?",
+      },
     },
   ];
   return res.send(resources);
@@ -78,6 +92,13 @@ router.post("/submit/audio", async (req: any, res: any) => {
           artist: resource.artist || "",
           assignment_type: "audio_recording",
           duration: resource.duration || 1200,
+          transcript: resource.transcript || {
+            "0:00": "No transcript available",
+            "0:29": "Are you excited to be at GSV?",
+            "0:38": "Absolutely.",
+            "0:39":
+              "It's fantastic to be here at the 2025 ASU GSV summit, sharing the wonders of Dreamscape Learn with everyone.",
+          },
         },
         userInfo: {
           user_id: token.user,
@@ -230,14 +251,43 @@ router.get("/submitted/audio", async (req: any, res: any) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const offset = (page - 1) * limit;
+    const token = res.locals.token;
+    const roles = res.locals.context?.roles || [];
 
-    const countResult = await db.query("SELECT COUNT(*) FROM submissions");
+    // Check if user is an instructor/admin
+    const isInstructor = roles.some(
+      (role: string) =>
+        role.includes("Instructor") ||
+        role.includes("Administrator") ||
+        role.includes("SysAdmin")
+    );
+
+    // Modify query based on role
+    let countQuery = "SELECT COUNT(*) FROM submissions";
+    let selectQuery = "SELECT * FROM submissions";
+    const queryParams = [];
+
+    // If not instructor, only show user's own submissions
+    if (!isInstructor) {
+      countQuery += " WHERE userid = $1";
+      selectQuery += " WHERE userid = $1";
+      queryParams.push(token.user);
+    }
+
+    selectQuery +=
+      ' ORDER BY "createdat" DESC LIMIT $' +
+      (queryParams.length + 1) +
+      " OFFSET $" +
+      (queryParams.length + 2);
+    queryParams.push(limit, offset);
+
+    const countResult = await db.query(
+      countQuery,
+      !isInstructor ? [token.user] : []
+    );
     const totalItems = parseInt(countResult.rows[0].count);
 
-    const result = await db.query(
-      'SELECT * FROM submissions ORDER BY "createdat" DESC LIMIT $1 OFFSET $2',
-      [limit, offset]
-    );
+    const result = await db.query(selectQuery, queryParams);
 
     // Transform the submissions data
     const formattedSubmissions = result.rows.map((submission) => ({
@@ -253,6 +303,10 @@ router.get("/submitted/audio", async (req: any, res: any) => {
         title: submission.title,
         artist: submission.artist,
         link: submission.link,
+        feedback: submission.feedback,
+        feedbackBy: submission.feedback_by,
+        feedbackAt: submission.feedback_at,
+        transcript: submission.items[0]?.custom?.transcript || {},
         duration: {
           seconds: submission.duration,
           formatted: formatDuration(submission.duration),
@@ -275,10 +329,56 @@ router.get("/submitted/audio", async (req: any, res: any) => {
         totalItems: totalItems,
         totalPages: Math.ceil(totalItems / limit),
       },
+      isInstructor, // Adding this to help frontend know user's role
     });
   } catch (error) {
     console.error("Error fetching submissions:", error);
     return res.status(500).send({ error: "Failed to fetch submissions" });
+  }
+});
+
+router.post("/feedback", async (req: any, res: any) => {
+  try {
+    const { submissionId, feedback } = req.body;
+    const token = res.locals.token;
+    const roles = res.locals.context?.roles || [];
+
+    // Check if user is an instructor/admin
+    const isInstructor = roles.some(
+      (role: string) =>
+        role.includes("Instructor") ||
+        role.includes("Administrator") ||
+        role.includes("SysAdmin")
+    );
+
+    // Only instructors can provide feedback
+    if (!isInstructor) {
+      return res.status(403).send({
+        error: "Only instructors can provide feedback",
+      });
+    }
+
+    // Validate required fields
+    if (!submissionId || feedback === undefined) {
+      return res.status(400).send({
+        error: "Missing required fields: submissionId or feedback",
+      });
+    }
+
+    // Update the submission with feedback
+    await db.query(
+      "UPDATE submissions SET feedback = $1, feedback_by = $2, feedback_at = $3 WHERE id = $4",
+      [feedback, token.user, new Date(), submissionId]
+    );
+
+    return res.send({
+      message: "Feedback saved successfully",
+      submissionId,
+      feedback,
+    });
+  } catch (error) {
+    console.error("Error saving feedback:", error);
+    return res.status(500).send({ error: "Failed to save feedback" });
   }
 });
 
@@ -293,7 +393,6 @@ function formatDuration(seconds: number): string {
 router.get("*", (req: any, res: any) => {
   const ltik = req.query.ltik;
   const path = req.path;
-
   // Preserve the original path when redirecting
   res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
 });
