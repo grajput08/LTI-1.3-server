@@ -402,6 +402,23 @@ function formatDuration(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
+// Names and Roles route
+router.get("/members", async (req: any, res: any) => {
+  try {
+    const result = await lti.NamesAndRoles.getMembers(res.locals.token);
+    if (result) {
+      return res.send(result.members);
+    }
+    return res.status(500).send({ error: "Failed to fetch members" });
+  } catch (err) {
+    console.error("Names and Roles Error:", err);
+    if (err instanceof Error) {
+      return res.status(500).send({ error: err.message });
+    }
+    return res.status(500).send({ error: "An unknown error occurred" });
+  }
+});
+
 // Update the catch-all route to handle the new paths
 router.get("*", (req: any, res: any) => {
   const ltik = req.query.ltik;
