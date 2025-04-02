@@ -1,4 +1,5 @@
 import db from "../db/config";
+import { dbQueries } from "../db/queries";
 const router = require("express").Router();
 const path = require("path");
 
@@ -142,42 +143,10 @@ router.post("/submit/audio", async (req: any, res: any) => {
         items: items,
       };
 
-      try {
-        // Convert duration from "mm:ss" to seconds
-        const durationInSeconds = submissionData.duration.includes(":")
-          ? submissionData.duration
-              .split(":")
-              .reduce(
-                (acc: number, time: string) => 60 * acc + parseInt(time),
-                0
-              )
-          : submissionData.duration || 1200;
+      await dbQueries.createSubmission(submissionData);
 
-        await db.query(
-          "INSERT INTO submissions (userId, title, artist, link, duration, createdAt, platformContext, items) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-          [
-            submissionData.userId,
-            submissionData.title,
-            submissionData.artist,
-            submissionData.link,
-            durationInSeconds,
-            submissionData.createdAt,
-            JSON.stringify(submissionData.platformContext),
-            JSON.stringify(submissionData.items),
-          ]
-        );
-      } catch (dbError) {
-        console.error("Database Error:", dbError);
-        return res.status(500).send({
-          error: "Failed to save submission to database",
-        });
-      }
-
-      console.log("Response JSON:", token, items, resource);
       return res.send(responseJson);
     } catch (dlError) {
-      console.error("Deep Linking Error:", dlError);
-      console.log("Deep Linking Settings:", dlError);
       if (dlError instanceof Error) {
         return res.status(400).send({
           error:
@@ -188,7 +157,6 @@ router.post("/submit/audio", async (req: any, res: any) => {
     }
   } catch (err: unknown) {
     if (err instanceof Error) {
-      console.error("Deep Linking Error:", err.message, err);
       return res.status(500).send({ error: err.message });
     }
     return res.status(500).send({ error: "Unknown error occurred" });
@@ -200,9 +168,8 @@ router.post("/submit/audio", async (req: any, res: any) => {
  */
 router.post("/grade", async (req: any, res: any) => {
   try {
-    const idtoken = res.locals.token; // IdToken
-    const score = req.body.grade; // User numeric score sent in the body
-    // Creating Grade object
+    const idtoken = res.locals.token;
+    const score = req.body.grade;
     const gradeObj = {
       userId: idtoken.user,
       scoreGiven: score,
@@ -211,48 +178,33 @@ router.post("/grade", async (req: any, res: any) => {
       gradingProgress: "FullyGraded",
     };
 
-    console.log("Grade Object:", gradeObj, idtoken);
-
-    // Selecting linetItem ID
-    let lineItemId = idtoken.platformContext.endpoint.lineitem; // Attempting to retrieve it from idtoken
-    console.log("Line Item ID:", lineItemId);
+    let lineItemId = idtoken.platformContext.endpoint.lineitem;
 
     if (!lineItemId) {
       const response = await lti.Grade.getLineItems(idtoken, {
         resourceLinkId: true,
       });
-      console.log("Response:", response);
       const lineItems = response.lineItems;
-      console.log("Line Items:", lineItems);
       if (lineItems.length === 0) {
-        // Creating line item if there is none
-        console.log("Creating new line item");
         const newLineItem = {
           scoreMaximum: 100,
           label: "Grade",
           tag: "grade",
           resourceLinkId: idtoken.platformContext.resource.id,
         };
-        console.log("New Line Item:", newLineItem);
         const lineItem = await lti.Grade.createLineItem(idtoken, newLineItem);
-        console.log("Line Item:", lineItem);
         lineItemId = lineItem.id;
-        console.log("Line Item ID:", lineItemId);
       } else lineItemId = lineItems[0].id;
     }
 
-    // Sending Grade
-    console.log("Sending Grade");
     const responseGrade = await lti.Grade.submitScore(
       idtoken,
       lineItemId,
       gradeObj
     );
-    console.log("Response Grade:", responseGrade);
     return res.send("Hello");
   } catch (err: unknown) {
     if (err instanceof Error) {
-      console.log("Grade Error:", err.message, err);
       return res.status(500).send({ error: err.message });
     }
     return res.status(500).send({ error: "An unknown error occurred" });
@@ -345,7 +297,6 @@ router.get("/submitted/audio", async (req: any, res: any) => {
       isInstructor, // Adding this to help frontend know user's role
     });
   } catch (error) {
-    console.error("Error fetching submissions:", error);
     return res.status(500).send({ error: "Failed to fetch submissions" });
   }
 });
@@ -390,7 +341,6 @@ router.post("/feedback", async (req: any, res: any) => {
       feedback,
     });
   } catch (error) {
-    console.error("Error saving feedback:", error);
     return res.status(500).send({ error: "Failed to save feedback" });
   }
 });
@@ -411,7 +361,6 @@ router.get("/members", async (req: any, res: any) => {
     }
     return res.status(500).send({ error: "Failed to fetch members" });
   } catch (err) {
-    console.error("Names and Roles Error:", err);
     if (err instanceof Error) {
       return res.status(500).send({ error: err.message });
     }
