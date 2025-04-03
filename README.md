@@ -138,9 +138,6 @@ npm run migrate
 # Create database tables
 npm run migrate:create
 
-# Clean up the database
-npm run migrate:cleanup
-
 # Test database connection
 npm run db:test
 ```
@@ -152,15 +149,6 @@ To test the LTI tool:
 ```bash
 npm run lti:test
 ```
-
-## Cleanup
-
-To cleanup the database:
-
-```bash
-npm run migrate:cleanup
-```
-
 ## Local Development with ngrok
 
 ### Step 1: Install and Set Up ngrok
