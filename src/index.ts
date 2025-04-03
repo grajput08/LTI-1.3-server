@@ -74,7 +74,7 @@ const setup = async () => {
   try {
     await lti.deploy({ port: PORT });
 
-    const platform = await lti.registerPlatform({
+    await lti.registerPlatform({
       url: "https://canvas.instructure.com",
       name: "Docker Canvas",
       clientId: process.env.CANVAS_CLIENT_ID || "client_id",
