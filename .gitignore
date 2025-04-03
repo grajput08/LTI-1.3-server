@@ -6,3 +6,4 @@ config/private*
 config/public*
 config/views*
 config/static*
+node_modules

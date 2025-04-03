@@ -52,8 +52,8 @@ npm run dev
 2. Configure the LTI tool in Canvas:
 
 - Go to the LTI tool configuration page in Canvas.
-- Set the tool's launch URL to `http://localhost:3000/ltijs/launch`.
-- Set the tool's login URL to `http://localhost:3000/ltijs/login`.
+- Set the tool's launch URL to `http://localhost:3000/`.
+- Set the tool's login URL to `http://localhost:3000/login`.
 
 ## Configuration
 
@@ -76,10 +76,10 @@ The `.env` file contains the following environment variables:
 3. Click "+ Developer Key" and select "LTI Key"
 4. Configure the following settings:
    - Title: "LTI Hello World"
-   - Target Link URI: `http://localhost:3000/ltijs/launch`
-   - OpenID Connect Initiation URL: `http://localhost:3000/ltijs/login`
+   - Target Link URI: `http://localhost:3000`
+   - OpenID Connect Initiation URL: `http://localhost:3000/login`
    - JWK Method: Public JWK URL
-   - Public JWK URL: `http://localhost:3000/ltijs/keys`
+   - Public JWK URL: `http://localhost:3000/keys`
    - Additional Settings:
      - Can create and update submission results
      - Can view submission results
@@ -213,17 +213,3 @@ Note: Each time you restart ngrok, you'll get a new URL and will need to update 
 - For persistent URLs, consider upgrading to a paid ngrok plan
 - Make sure your Canvas instance can reach your ngrok URL
 - Keep your ngrok terminal window open while testing
-
-## LTI 1.3 Flow Diagram
-
-![Step 1: Initial Launch Request](./public/Step%201.png)
-
-![Step 2: OIDC Login Initiation](./public/step%202.png)
-
-![Step 3: Authentication Response](./public/Step%203.png)
-
-![Step 4: Launch URL Redirect](./public/step%204.png)
-
-![Step 5: Tool Display](./public/step%205.png)
-
-For technical details about each step, refer to the [LTI 1.3 Implementation Guide](https://www.imsglobal.org/spec/lti/v1p3/).
