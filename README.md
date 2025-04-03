@@ -13,8 +13,7 @@ A TypeScript-based Learning Tools Interoperability (LTI) 1.3 tool for integratio
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/grajput08/LTI-1.3-server.git
-cd lti-hello-world
+git clone https://grajput2@bitbucket.org/edplusasu/lti-poc.git
 ```
 
 2. Install dependencies:
@@ -149,6 +148,7 @@ To test the LTI tool:
 ```bash
 npm run lti:test
 ```
+
 ## Local Development with ngrok
 
 ### Step 1: Install and Set Up ngrok
