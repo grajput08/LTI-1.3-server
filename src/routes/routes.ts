@@ -6,6 +6,9 @@ const path = require("path");
 // Requiring Ltijs
 const lti = require("ltijs").Provider;
 
+import { upload } from "../middleware/upload.middleware";
+import { uploadService } from "../services/upload.service";
+
 router.get("/resources", async (req: any, res: any) => {
   const resources = [
     {
@@ -375,5 +378,48 @@ router.get("*", (req: any, res: any) => {
   // Preserve the original path when redirecting
   res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
 });
+
+// Upload audio file route
+router.post(
+  "/upload/audio",
+  upload.single("audio"),
+  async (req: any, res: any) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send({ error: "No audio file provided" });
+      }
+
+      const token = res.locals.token;
+      const roles = res.locals.context?.roles || [];
+
+      // Check if user is a student
+      const isStudent = roles.some(
+        (role: string) => role.includes("Student") || role.includes("Learner")
+      );
+
+      if (!isStudent) {
+        return res.status(403).send({
+          error: "Only students can upload audio files",
+        });
+      }
+
+      const result = await uploadService.uploadAudioToS3(
+        req.file.buffer,
+        token.user,
+        req.file.mimetype
+      );
+
+      return res.status(200).send({
+        message: "File uploaded successfully",
+        ...result,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return res.status(500).send({ error: err.message });
+      }
+      return res.status(500).send({ error: "Failed to upload file" });
+    }
+  }
+);
 
 export default router;

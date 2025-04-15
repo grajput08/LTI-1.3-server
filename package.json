@@ -16,11 +16,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.787.0",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.0",
     "@types/ltijs": "^4.0.12",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
+    "@types/uuid": "^10.0.0",
     "body-parser": "^1.20.3",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
@@ -28,8 +31,10 @@
     "jsonwebtoken": "^9.0.2",
     "ltijs": "^5.9.6",
     "ltijs-sequelize": "^2.4.4",
+    "multer": "^1.4.5-lts.2",
     "pg": "^8.14.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
