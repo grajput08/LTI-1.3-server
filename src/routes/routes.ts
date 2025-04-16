@@ -62,6 +62,15 @@ router.get("/info", async (req: any, res: any) => {
   }
   if (context.roles) info.roles = context.roles;
 
+  await dbQueries.upsertUser({
+    user_id: token.user,
+    given_name: token.userInfo.given_name,
+    family_name: token.userInfo.family_name,
+    name: token.userInfo.name,
+    email: token.userInfo.email,
+    roles: context.roles,
+  });
+
   return res.send(info);
 });
 
@@ -371,14 +380,6 @@ router.get("/members", async (req: any, res: any) => {
   }
 });
 
-// Update the catch-all route to handle the new paths
-router.get("*", (req: any, res: any) => {
-  const ltik = req.query.ltik;
-  const path = req.path;
-  // Preserve the original path when redirecting
-  res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
-});
-
 // Upload audio file route
 router.post(
   "/upload/audio",
@@ -409,9 +410,20 @@ router.post(
         req.file.mimetype
       );
 
+      // Save audio file information to database
+      const audioFileData = {
+        userId: token.user,
+        fileName: req.file.originalname,
+        fileUrl: result.fileUrl,
+        mimeType: req.file.mimetype,
+      };
+
+      const dbResult = await dbQueries.saveAudioFile(audioFileData);
+
       return res.status(200).send({
         message: "File uploaded successfully",
         ...result,
+        ...dbResult.rows[0],
       });
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -421,5 +433,63 @@ router.post(
     }
   }
 );
+
+router.get("/recordings", async (req: any, res: any) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
+    const token = res.locals.token;
+    const roles = res.locals.context?.roles || [];
+
+    // Check if user is an instructor/admin
+    const isInstructor = roles.some(
+      (role: string) =>
+        role.includes("Instructor") ||
+        role.includes("Administrator") ||
+        role.includes("SysAdmin")
+    );
+
+    const { recordings, totalCount } = await dbQueries.getRecordings(
+      token.user,
+      isInstructor,
+      limit,
+      offset
+    );
+
+    // Transform the results
+    const userRecordings = recordings.rows.map((row) => ({
+      user: {
+        id: row.user_id,
+        name: row.name,
+        email: row.email,
+        givenName: row.given_name,
+        familyName: row.family_name,
+      },
+      recordings: row.recordings,
+    }));
+
+    return res.send({
+      recordings: userRecordings,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+      isInstructor,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Failed to fetch recordings" });
+  }
+});
+
+// Update the catch-all route to handle the new paths
+router.get("*", (req: any, res: any) => {
+  const ltik = req.query.ltik;
+  const path = req.path;
+  // Preserve the original path when redirecting
+  res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
+});
 
 export default router;

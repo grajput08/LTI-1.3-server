@@ -18,6 +18,29 @@ export const createTables = async () => {
         items JSONB
       );
     `);
+    await pool.query(`
+      CREATE TABLE users (
+        user_id VARCHAR(255) PRIMARY KEY,
+        given_name VARCHAR(100),
+        family_name VARCHAR(100),
+        name VARCHAR(200),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        roles VARCHAR(255)[] DEFAULT ARRAY[]::VARCHAR(255)[]
+      );
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS audio_files (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(255) REFERENCES users(user_id),
+        file_name VARCHAR(255) NOT NULL,
+        file_url VARCHAR(1024) NOT NULL,
+        mime_type VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
     console.log("✅ Database tables created successfully");
   } catch (error) {
     console.error("❌ Error creating tables:", error);

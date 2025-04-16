@@ -19,6 +19,27 @@ interface FeedbackData {
   feedbackAt: Date;
 }
 
+interface UserData {
+  user_id: string;
+  given_name?: string;
+  family_name?: string;
+  name?: string;
+  email: string;
+  roles?: string[];
+}
+
+interface AudioFileData {
+  userId: string;
+  fileName: string;
+  fileUrl: string;
+  mimeType: string;
+}
+
+interface RecordingQueryResult {
+  recordings: QueryResult;
+  totalCount: number;
+}
+
 export class DatabaseQueries {
   private db: Pool;
 
@@ -105,6 +126,101 @@ export class DatabaseQueries {
             WHERE id = $4`,
       [data.feedback, data.feedbackBy, data.feedbackAt, data.submissionId]
     );
+  }
+
+  /**
+   * Check if user exists, create if they don't
+   */
+  async upsertUser(data: UserData): Promise<QueryResult> {
+    // First check if user exists
+    const existingUser = await this.db.query(
+      `SELECT user_id FROM users WHERE user_id = $1`,
+      [data.user_id]
+    );
+
+    // If user doesn't exist, create new user
+    if (existingUser.rows.length === 0) {
+      return await this.db.query(
+        `INSERT INTO users (user_id, given_name, family_name, name, email, roles)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          data.user_id,
+          data.given_name || null,
+          data.family_name || null,
+          data.name || null,
+          data.email,
+          data.roles || null,
+        ]
+      );
+    }
+
+    // User already exists, return the existing user query result
+    return existingUser;
+  }
+
+  /**
+   * Saves audio file information to database
+   */
+  async saveAudioFile(data: AudioFileData): Promise<QueryResult> {
+    return await this.db.query(
+      `INSERT INTO audio_files 
+        (user_id, file_name, file_url, mime_type) 
+        VALUES ($1, $2, $3, $4)
+        RETURNING id, file_url`,
+      [data.userId, data.fileName, data.fileUrl, data.mimeType]
+    );
+  }
+
+  /**
+   * Gets recordings with pagination and role-based filtering
+   */
+  async getRecordings(
+    userId: string,
+    isInstructor: boolean,
+    limit: number,
+    offset: number
+  ): Promise<RecordingQueryResult> {
+    let countQuery =
+      "SELECT COUNT(DISTINCT u.user_id) FROM users u JOIN audio_files af ON u.user_id = af.user_id";
+    let selectQuery = `
+      SELECT u.user_id, u.name, u.email, u.given_name, u.family_name,
+             array_agg(json_build_object(
+               'id', af.id,
+               'fileName', af.file_name,
+               'fileUrl', af.file_url,
+               'mimeType', af.mime_type,
+               'createdAt', af.created_at
+             )) as recordings
+      FROM users u
+      JOIN audio_files af ON u.user_id = af.user_id`;
+    const queryParams = [];
+
+    // If not instructor, only show user's own recordings
+    if (!isInstructor) {
+      countQuery += " WHERE u.user_id = $1";
+      selectQuery += " WHERE u.user_id = $1";
+      queryParams.push(userId);
+    }
+
+    selectQuery += ` GROUP BY u.user_id, u.name, u.email, u.given_name, u.family_name
+                     ORDER BY u.name
+                     LIMIT $${queryParams.length + 1} OFFSET $${
+      queryParams.length + 2
+    }`;
+    queryParams.push(limit, offset);
+
+    const countResult = await this.db.query(
+      countQuery,
+      !isInstructor ? [userId] : []
+    );
+    const totalCount = parseInt(countResult.rows[0].count);
+
+    const recordings = await this.db.query(selectQuery, queryParams);
+
+    return {
+      recordings,
+      totalCount,
+    };
   }
 }
 
