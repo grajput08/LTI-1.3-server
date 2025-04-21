@@ -1,13 +1,18 @@
-# Creating a LTI 1.3 Development Key
+# Canvas LTI Integration
 
-**Note:** The URLs mentioned in this documentation are for local development (http://localhost:3002). For different environments, use the appropriate URLs:
+**Important Environment Note:**
+This documentation uses URLs for local development (http://localhost:3002). When configuring the LTI tool in different environments, replace all URLs with the appropriate environment-specific domain:
 
-- Local: http://localhost:3002
-- Development: https://dev-lti.yourdomain.com
-- Staging: https://staging-lti.yourdomain.com
-- Production: https://lti.yourdomain.com
+| Environment | Base URL                           |
+| ----------- | ---------------------------------- |
+| Local       | http://localhost:3002              |
+| Development | https://dev-lti.yourdomain.com     |
+| Staging     | https://staging-lti.yourdomain.com |
+| Production  | https://lti.yourdomain.com         |
 
 Make sure to replace all instances of http://localhost:3002 with the appropriate environment URL when configuring the LTI tool.
+
+# Creating a LTI 1.3 Development Key
 
 This section will guide you through the steps necessary to complete the setup of this Development Key.
 
@@ -129,7 +134,7 @@ Supports the following Placements. Configure these settings:
 
    ![Canvas Settings Apps View App Configuration|400x300](/public/images/8.png)
 
-3. To add Skillable as a new Canvas App select + App from the top right of the list.
+3. To add LTI Tool as a new Canvas App select + App from the top right of the list.
 
    ![Canvas Settings Add App|400x300](/public/images/9.png)
 
@@ -183,3 +188,10 @@ Follow these steps to verify your LTI tool integration is working correctly:
 2. Use the "Load in a New Window" button to open the assignment
 
 ![Canvas Settings Add App Install|400x300](/public/images/13.png)
+
+# Additional Resources
+
+For more detailed information about LTI configuration and setup, please refer to the following Canvas guides:
+
+- [How to Configure an LTI Key for an Account](https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140) - Detailed steps for creating and configuring LTI 1.3 Developer Keys
+- [How to Configure an External App Using Client ID](https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202) - Instructions for installing LTI tools using the Client ID method
