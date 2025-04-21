@@ -1,13 +1,13 @@
 # Creating a LTI 1.3 Development Key
 
-\*\*Note: The URLs mentioned in this documentation are for local development (http://localhost:3002). For different environments, use the appropriate URLs:
+**Note:** The URLs mentioned in this documentation are for local development (http://localhost:3002). For different environments, use the appropriate URLs:
 
 - Local: http://localhost:3002
 - Development: https://dev-lti.yourdomain.com
 - Staging: https://staging-lti.yourdomain.com
 - Production: https://lti.yourdomain.com
 
-Make sure to replace all instances of http://localhost:3002 with the appropriate environment URL when configuring the LTI tool.\*\*
+Make sure to replace all instances of http://localhost:3002 with the appropriate environment URL when configuring the LTI tool.
 
 This section will guide you through the steps necessary to complete the setup of this Development Key.
 
@@ -17,11 +17,11 @@ This section will guide you through the steps necessary to complete the setup of
 
 3. To access the Developer Keys select Developer Keys from the list of options on the left.
 
-   ![Canvas Developer Keys](/public/images/1.png)
+   ![Canvas Developer Keys|400x300](/public/images/1.png)
 
 4. To add a new LTI Developer Key, from the top right of the list, select + Developer Key button [1], then select + LTI Key option [2].
 
-   ![Canvas LTI Developer Key](/public/images/2.png)
+   ![Canvas LTI Developer Key|400x300](/public/images/2.png)
 
 ## Identifying Information
 
@@ -51,7 +51,7 @@ Enter the following values:
 | JWK Method                    | Public JWK URL                                          |
 | Public JWK                    | http://localhost:3002/lti/keys                          |
 
-![Canvas Developer Key base config](/public/images/3.png)
+![Canvas Developer Key base config|400x300](/public/images/3.png)
 
 ### Method 2: Paste JSON
 
@@ -76,13 +76,13 @@ Select LTI Advantage Services and enable the following settings:
 - Can view progress records associated with the context the tool is installed in
 - Can view the content of a page the tool is launched from
 
-![Canvas Developer Key LTI Advantage Services](/public/images/4.png)
+![Canvas Developer Key LTI Advantage Services|400x300](/public/images/4.png)
 
 ## Placements Configuration
 
 Supports the following Placements. Configure these settings:
 
-![Canvas Developer Key Placements](/public/images/5.png)
+![Canvas Developer Key Placements|400x300](/public/images/5.png)
 
 ### Assignment Selection
 
@@ -117,36 +117,36 @@ Supports the following Placements. Configure these settings:
 2. On the Developer Keys list page, enable the Developer Key by changing the state to ON
 3. Copy the Client ID Key from the Details column (located above the Show Key button)
 
-![Canvas Developer Key LTI Copy Key](/public/images/6.png)
+![Canvas Developer Key LTI Copy Key|400x300](/public/images/6.png)
 
 # Adding LTI Tool as an External App
 
 1. From the Canvas Admin page [1], select Settings from the options on the left [2], then select the Apps tab [3].
 
-   ![Canvas Settings Apps](/public/images/7.png)
+   ![Canvas Settings Apps|400x300](/public/images/7.png)
 
 2. To view the existing set of Canvas Apps select View App Configurations.
 
-   ![Canvas Settings Apps View App Configuration](/public/images/8.png)
+   ![Canvas Settings Apps View App Configuration|400x300](/public/images/8.png)
 
 3. To add Skillable as a new Canvas App select + App from the top right of the list.
 
-   ![Canvas Settings Add App](/public/images/9.png)
+   ![Canvas Settings Add App|400x300](/public/images/9.png)
 
 4. Since we have already configured the Canvas LTI 1.3 Developer Key and have the Client ID, select By Client ID from the Configuration Type field.
 
-   ![Canvas Settings Add App By Client ID](/public/images/10.png)
+   ![Canvas Settings Add App By Client ID|400x300](/public/images/10.png)
 
 5. To complete the LTI Tool App configuration:
 
    - Paste the Client ID copied at the end of the previous exercise into the Client ID field [1]
    - Select Submit [2]
 
-   ![Canvas Settings Add App By Client ID](/public/images/11.png)
+   ![Canvas Settings Add App By Client ID|400x300](/public/images/11.png)
 
 6. On the confirmation dialog window select Install to install LTI Tool as a new Canvas External App.
 
-   ![Canvas Settings Add App Install](/public/images/12.png)
+   ![Canvas Settings Add App Install|400x300](/public/images/12.png)
 
 # Steps to Test an LTI Tool
 
@@ -182,4 +182,4 @@ Follow these steps to verify your LTI tool integration is working correctly:
 1. Save the assignment configuration
 2. Use the "Load in a New Window" button to open the assignment
 
-![Canvas Settings Add App Install](/public/images/13.png)
+![Canvas Settings Add App Install|400x300](/public/images/13.png)
