@@ -56,7 +56,7 @@ Enter the following values:
 | JWK Method                    | Public JWK URL                                          |
 | Public JWK                    | http://localhost:3002/lti/keys                          |
 
-![Canvas Developer Key base config|400x300](/public/images/3.png)
+![Canvas Developer Key base config|200x200](/public/images/3.png)
 
 ### Method 2: Paste JSON
 
@@ -81,13 +81,13 @@ Select LTI Advantage Services and enable the following settings:
 - Can view progress records associated with the context the tool is installed in
 - Can view the content of a page the tool is launched from
 
-![Canvas Developer Key LTI Advantage Services|400x300](/public/images/4.png)
+![Canvas Developer Key LTI Advantage Services|200x200](/public/images/4.png)
 
 ## Placements Configuration
 
 Supports the following Placements. Configure these settings:
 
-![Canvas Developer Key Placements|400x300](/public/images/5.png)
+![Canvas Developer Key Placements|200x200](/public/images/5.png)
 
 ### Assignment Selection
 
@@ -128,7 +128,7 @@ Supports the following Placements. Configure these settings:
 
 1. From the Canvas Admin page [1], select Settings from the options on the left [2], then select the Apps tab [3].
 
-   ![Canvas Settings Apps|400x300](/public/images/7.png)
+   ![Canvas Settings Apps|200x200](/public/images/7.png)
 
 2. To view the existing set of Canvas Apps select View App Configurations.
 
@@ -187,7 +187,7 @@ Follow these steps to verify your LTI tool integration is working correctly:
 1. Save the assignment configuration
 2. Use the "Load in a New Window" button to open the assignment
 
-![Canvas Settings Add App Install|400x300](/public/images/13.png)
+![Canvas Settings Add App Install|200x200](/public/images/13.png)
 
 # Additional Resources
 
