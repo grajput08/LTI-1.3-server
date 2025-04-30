@@ -132,6 +132,9 @@ export class DatabaseQueries {
    * Check if user exists, create if they don't
    */
   async upsertUser(data: UserData): Promise<QueryResult> {
+    // If email is missing, generate a placeholder email using user_id
+    const email = data.email || `${data.user_id}@placeholder.com`;
+
     // First check if user exists
     const existingUser = await this.db.query(
       `SELECT user_id FROM users WHERE user_id = $1`,
@@ -142,20 +145,38 @@ export class DatabaseQueries {
     if (existingUser.rows.length === 0) {
       return await this.db.query(
         `INSERT INTO users (user_id, given_name, family_name, name, email, roles)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+             VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           data.user_id,
           data.given_name || null,
           data.family_name || null,
           data.name || null,
-          data.email,
-          data.roles || null,
+          email, // Use the email or placeholder
+          data.roles || [],
         ]
       );
     }
 
-    // User already exists, return the existing user query result
-    return existingUser;
+    // If user exists, update their information
+    return await this.db.query(
+      `UPDATE users 
+         SET given_name = COALESCE($2, given_name),
+             family_name = COALESCE($3, family_name),
+             name = COALESCE($4, name),
+             email = COALESCE($5, email),
+             roles = COALESCE($6, roles),
+             updated_at = CURRENT_TIMESTAMP
+         WHERE user_id = $1
+         RETURNING *`,
+      [
+        data.user_id,
+        data.given_name || null,
+        data.family_name || null,
+        data.name || null,
+        email, // Use the email or placeholder
+        data.roles || [],
+      ]
+    );
   }
 
   /**
