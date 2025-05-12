@@ -7,3 +7,4 @@ config/views*
 config/static*
 node_modules
 .vercel
+.env.production.local
