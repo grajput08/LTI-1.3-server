@@ -44,7 +44,6 @@ lti.setup(
   }
 );
 
-// Configure view engine
 lti.app.set("views", path.join(__dirname, "views"));
 lti.app.set("view engine", "ejs");
 
