@@ -19,6 +19,12 @@ const db = new Database(
     dialect: "postgres",
     logging: false,
     port: parseInt(process.env.DB_PORT || "5432"),
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   }
 );
 

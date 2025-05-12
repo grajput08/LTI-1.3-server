@@ -4,6 +4,12 @@ declare module "ltijs-sequelize" {
     dialect: "postgres" | "mysql" | "sqlite" | "mariadb" | "mssql";
     logging?: boolean | Function;
     port?: number;
+    dialectOptions?: {
+      ssl?: {
+        require?: boolean;
+        rejectUnauthorized?: boolean;
+      };
+    };
   }
 
   class Database {
