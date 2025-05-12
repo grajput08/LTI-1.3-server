@@ -6,7 +6,7 @@
     "dev": "env DEBUG=provider:* nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "vercel-build": "tsc && npm run migrate",
+    "vercel-build": "tsc",
     "migrate": "npm run migrate:create",
     "migrate:create": "ts-node src/db/migrations/create-tables.ts",
     "db:test": "ts-node src/db/config.ts"

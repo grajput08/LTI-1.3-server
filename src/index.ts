@@ -39,7 +39,7 @@ lti.setup(
     plugin: db,
   },
   {
-    appUrl: `http://localhost:4001/?ltik=${LTI_KEY}`,
+    appUrl: `https://ltijs-demo-client-h5wi.vercel.app/?ltik=${LTI_KEY}`,
     loginUrl: "/login",
     staticPath: path.join(__dirname, "../public"),
     cookies: {
