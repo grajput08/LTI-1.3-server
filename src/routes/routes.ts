@@ -9,6 +9,15 @@ const lti = require("ltijs").Provider;
 import { upload } from "../middleware/upload.middleware";
 import { uploadService } from "../services/upload.service";
 
+// Test endpoint
+router.get("/test", (req: any, res: any) => {
+  res.json({
+    status: "success",
+    message: "Test endpoint is working!",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 router.get("/resources", async (req: any, res: any) => {
   const resources = [
     {

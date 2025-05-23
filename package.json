@@ -28,6 +28,7 @@
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "get-port": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "ltijs": "^5.9.6",
     "ltijs-sequelize": "^2.4.4",
