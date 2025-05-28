@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "env DEBUG=provider:* nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts",
+    "dev": "env DEBUG=provider:* nodemon --watch 'dist/**/*.js' --exec ts-node dist/index.js",
     "build": "tsc",
     "start": "node dist/index.js",
     "vercel-build": "tsc",

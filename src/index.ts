@@ -20,10 +20,13 @@ const db = new Database(
     logging: false,
     port: parseInt(process.env.DB_PORT || "5432"),
     dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
+      ssl:
+        process.env.NODE_ENV === "production"
+          ? {
+              require: true,
+              rejectUnauthorized: false,
+            }
+          : undefined,
     },
   }
 );
