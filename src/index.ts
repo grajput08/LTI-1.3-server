@@ -46,10 +46,9 @@ lti.setup(
     loginUrl: "/login",
     staticPath: path.join(__dirname, "../public"),
     cookies: {
-      secure: true, // Set secure to true if the testing platform is in a different domain and https is being used
+      secure: false, // Set secure to true if the testing platform is in a different domain and https is being used
       sameSite: "", // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
     },
-    devMode: true,
   }
 );
 
