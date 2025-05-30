@@ -427,6 +427,6 @@ router.get("*", (req, res) => {
     const ltik = req.query.ltik;
     const path = req.path;
     // Preserve the original path when redirecting
-    res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
+    res.redirect(`https://ltijs-demo-client-h5wi.vercel.app/${path}${ltik ? `?ltik=${ltik}` : ""}`);
 });
 exports.default = router;
