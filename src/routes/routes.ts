@@ -241,7 +241,7 @@ router.post("/submit/audio", async (req: any, res: any) => {
 /**
  * sendGrade
  */
-lti.app.post("/grade", async (req: any, res: any) => {
+router.post("/grade", async (req: any, res: any) => {
   console.log("inside grade");
   try {
     console.log("inside grade try");
