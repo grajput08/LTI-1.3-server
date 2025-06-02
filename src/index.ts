@@ -49,7 +49,6 @@ lti.setup(
       secure: false, // Set secure to true if the testing platform is in a different domain and https is being used
       sameSite: "None", // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
     },
-    devMode: true,
   }
 );
 
@@ -83,7 +82,7 @@ const setup = async () => {
     await lti.deploy({ port: PORT });
 
     await lti.registerPlatform({
-      url: "https://canvas.instructure.com",
+      url: "http://canvas.instructure.com",
       name: "Docker Canvas",
       clientId: process.env.CANVAS_CLIENT_ID || "client_id",
       authenticationEndpoint: `${process.env.CANVAS_URL}/api/lti/authorize_redirect`,
