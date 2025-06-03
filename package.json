@@ -1,11 +1,11 @@
 {
   "name": "lti-hello-world",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "env DEBUG=provider:* nodemon --watch 'dist/**/*.js' --exec ts-node dist/index.js",
+    "dev": "env DEBUG=provider:* nodemon --watch 'dist/**/*.js' --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node src/index.ts",
     "vercel-build": "tsc",
     "migrate": "npm run migrate:create",
     "migrate:create": "ts-node src/db/migrations/create-tables.ts",

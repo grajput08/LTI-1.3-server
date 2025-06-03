@@ -187,102 +187,40 @@ router.post("/submit/audio", async (req: any, res: any) => {
 /**
  * sendGrade
  */
-// router.post("/grade", async (req: any, res: any) => {
-//   console.log("inside grade");
-//   try {
-//     const idtoken = res.locals.token;
-//     console.log("idtoken", idtoken);
-//     const score = req.body.grade;
-//     console.log("score", score);
-//     const gradeObj = {
-//       userId: idtoken.user,
-//       scoreGiven: score,
-//       scoreMaximum: 100,
-//       activityProgress: "Completed",
-//       gradingProgress: "FullyGraded",
-//     };
-//     console.log("gradeObj", gradeObj);
-//     let lineItemId = idtoken.platformContext.endpoint.lineitem;
-//     console.log("lineItemId", lineItemId);
-//     if (!lineItemId) {
-//       const response = await lti.Grade.getLineItems(idtoken, {
-//         resourceLinkId: true,
-//       });
-//       const lineItems = response.lineItems;
-//       if (lineItems.length === 0) {
-//         const newLineItem = {
-//           scoreMaximum: 100,
-//           label: "Grade",
-//           tag: "grade",
-//           resourceLinkId: idtoken.platformContext.resource.id,
-//         };
-//         const lineItem = await lti.Grade.createLineItem(idtoken, newLineItem);
-//         lineItemId = lineItem.id;
-//       } else lineItemId = lineItems[0].id;
-//     }
-
-//     const responseGrade = await lti.Grade.submitScore(
-//       idtoken,
-//       lineItemId,
-//       gradeObj
-//     );
-//     console.log("responseGrade", responseGrade);
-//     return res.send(responseGrade);
-//   } catch (err: unknown) {
-//     console.log("err", err);
-//     if (err instanceof Error) {
-//       return res.status(500).send({ error: err.message });
-//     }
-//     console.log("err", err);
-//     return res.status(500).send({ error: "An unknown error occurred" });
-//   }
-// });
-
-/**
- * sendGrade
- */
 router.post("/grade", async (req: any, res: any) => {
   console.log("inside grade");
   try {
-    console.log("inside grade try");
-    const idtoken = res.locals.token; // IdToken
+    const idtoken = res.locals.token;
     console.log("idtoken", idtoken);
-    const score = req.body.grade; // User numeric score sent in the body
-    // Creating Grade object
-    console.log("inside gradeObj");
+    const score = req.body.grade;
+    console.log("score", score);
     const gradeObj = {
       userId: idtoken.user,
-      scoreGiven: 100,
+      scoreGiven: score,
       scoreMaximum: 100,
       activityProgress: "Completed",
       gradingProgress: "FullyGraded",
     };
     console.log("gradeObj", gradeObj);
-    // Selecting linetItem ID
-    let lineItemId = idtoken.platformContext.endpoint.lineitem; // Attempting to retrieve it from idtoken
+    let lineItemId = idtoken.platformContext.endpoint.lineitem;
     console.log("lineItemId", lineItemId);
     if (!lineItemId) {
       const response = await lti.Grade.getLineItems(idtoken, {
         resourceLinkId: true,
       });
       const lineItems = response.lineItems;
-      console.log("lineItems", lineItems);
       if (lineItems.length === 0) {
-        // Creating line item if there is none
-        console.log("Creating new line item");
         const newLineItem = {
           scoreMaximum: 100,
           label: "Grade",
           tag: "grade",
           resourceLinkId: idtoken.platformContext.resource.id,
         };
-        console.log("newLineItem", newLineItem);
         const lineItem = await lti.Grade.createLineItem(idtoken, newLineItem);
         lineItemId = lineItem.id;
       } else lineItemId = lineItems[0].id;
     }
 
-    // Sending Grade
     const responseGrade = await lti.Grade.submitScore(
       idtoken,
       lineItemId,
@@ -291,9 +229,11 @@ router.post("/grade", async (req: any, res: any) => {
     console.log("responseGrade", responseGrade);
     return res.send(responseGrade);
   } catch (err: unknown) {
+    console.log("err", err);
     if (err instanceof Error) {
       return res.status(500).send({ error: err.message });
     }
+    console.log("err", err);
     return res.status(500).send({ error: "An unknown error occurred" });
   }
 });
@@ -564,11 +504,7 @@ router.get("*", (req: any, res: any) => {
   const ltik = req.query.ltik;
   const path = req.path;
   // Preserve the original path when redirecting
-  res.redirect(
-    `https://ltijs-demo-client-h5wi.vercel.app/${path}${
-      ltik ? `?ltik=${ltik}` : ""
-    }`
-  );
+  res.redirect(`http://localhost:4001${path}${ltik ? `?ltik=${ltik}` : ""}`);
 });
 
 export default router;

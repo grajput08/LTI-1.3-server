@@ -42,13 +42,14 @@ lti.setup(
     plugin: db,
   },
   {
-    appUrl: `https://ltijs-demo-client-h5wi.vercel.app/?ltik=${LTI_KEY}`,
+    appUrl: `https://ltijs-demo-client-h5wi.vercel.app?ltik=${LTI_KEY}`,
     loginUrl: "/login",
     staticPath: path.join(__dirname, "../public"),
     cookies: {
       secure: false, // Set secure to true if the testing platform is in a different domain and https is being used
       sameSite: "None", // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
     },
+    devMode: true,
   }
 );
 
@@ -82,7 +83,7 @@ const setup = async () => {
     await lti.deploy({ port: PORT });
 
     await lti.registerPlatform({
-      url: "http://canvas.instructure.com",
+      url: "https://canvas.instructure.com",
       name: "Docker Canvas",
       clientId: process.env.CANVAS_CLIENT_ID || "client_id",
       authenticationEndpoint: `${process.env.CANVAS_URL}/api/lti/authorize_redirect`,
